@@ -121,24 +121,47 @@ jsonrpc.JsonRpc.prototype = {
 	},
 
 	_doJsonPost: function (url, data, callback) {
+		var domain = new URI(url).domain();
+		var crossDomain = domain && domain != new URI(location.href).domain();
+
 		var xhr = new XMLHttpRequest();
-		xhr.open("POST", url, true);
-		xhr.setRequestHeader('Content-Type', 'application/json');
-		xhr.onreadystatechange = function () {
-			if (xhr.readyState !== 4) {
-				return;
-			}
+		if (!crossDomain || "withCredentials" in xhr) {
+			// not crossdomain, or crossdomain supported by XMLHttpRequest.
+			//
+			xhr.open("POST", url, true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState !== 4) {
+					return;
+				}
 
-			var contentType = xhr.getResponseHeader('Content-Type');
+				var contentType = xhr.getResponseHeader('Content-Type');
 
-			if (xhr.status !== 200) {
-				callback(false, 'Expected HTTP response "200 OK", found "' + xhr.status + ' ' + xhr.statusText + '"');
-			} else if (contentType.indexOf('application/json') !== 0) {
-				callback(false, 'Expected JSON encoded response, found "' + contentType + '"');
-			} else {
+				if (xhr.status !== 200) {
+					callback(false, 'Expected HTTP response "200 OK", found "' + xhr.status + ' ' + xhr.statusText + '"');
+				} else if (contentType.indexOf('application/json') !== 0) {
+					callback(false, 'Expected JSON encoded response, found "' + contentType + '"');
+				} else {
+					callback(true, JSON.parse(this.responseText));
+				}
+			};
+			xhr.send(JSON.stringify(data));
+
+		} else if (typeof XDomainRequest != "undefined"){
+			// crossdomain under old IE, using XDomainRequest
+			//
+			var xhr = new XDomainRequest();
+			xhr.open("POST", url);
+			xhr.onerror = function() {
+				callback(false, 'request failed: ' + this.responseText);
+			};
+			xhr.onload = function() {
 				callback(true, JSON.parse(this.responseText));
-			}
-		};
-		xhr.send(JSON.stringify(data));
+			};
+			xhr.send(JSON.stringify(data))
+
+		} else {
+			throw "crossdomain AJAX calls not supported";
+		}
 	}
 };
