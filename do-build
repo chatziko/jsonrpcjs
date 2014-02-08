@@ -1,0 +1,8 @@
+#!/bin/bash
+
+mkdir build
+
+echo 'jsonrpc={};' > build/jsonrpc.js
+cat src/* >> build/jsonrpc.js
+
+./minifyjs build/jsonrpc.js
