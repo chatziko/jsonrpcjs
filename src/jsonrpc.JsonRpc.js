@@ -76,7 +76,7 @@ jsonrpc.JsonRpc.prototype = {
 		if (success) {
 			request.success.call(request.scope, ret);
 		} else {
-			request.failure.call(request.scope, ret);
+			request.failure.call(request.scope, ret, response.error);
 		}
 		request.callback.call(request.scope, success, ret);
 	},
