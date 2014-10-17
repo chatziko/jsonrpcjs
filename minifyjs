@@ -3,7 +3,7 @@
 # Takes a filename myjs.x.y.js and outputs myjs.x.y.min.js, a minified version.
 
 # The location of the closure compiler jar. You'll probably need to edit this.
-CLOSURE_COMPILER=/usr/local/bin/closure-compiler.jar
+CLOSURE_COMPILER=/usr/share/java/closure-compiler.jar
 
 case "$1" in
 ""|"-h"|"--help")
