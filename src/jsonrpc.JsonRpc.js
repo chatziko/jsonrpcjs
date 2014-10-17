@@ -121,8 +121,8 @@ jsonrpc.JsonRpc.prototype = {
 	},
 
 	_doJsonPost: function (url, data, callback) {
-		var domain = new URI(url).domain();
-		var crossDomain = domain && domain != new URI(location.href).domain();
+		var hostname = new URI(url).hostname();
+		var crossDomain = hostname && hostname != new URI(location.href).hostname();
 
 		var xhr = new XMLHttpRequest();
 		if (!crossDomain || "withCredentials" in xhr) {
